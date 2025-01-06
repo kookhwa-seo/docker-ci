@@ -35,6 +35,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      - name: Set tag format
+        id: set_tag
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Build and push Docker Image
         uses: docker/build-push-action@v4
@@ -42,19 +45,6 @@ jobs:
           context: .
           push: true
           tags: |
-            dbgurum/nodejs-ci:${{ github.ref }}
-            dbgurum/nodejs-ci:latest
-          labels: ${{ steps.docker_meta.outputs.labels }}
-      - name: Set tag format
-        id: set_tag
-        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-      - name: Build and push Docker Image with correct tag
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: |
             dbgurum/nodejs-ci:${{ env.TAG }}
             dbgurum/nodejs-ci:latest
-          labels: ${{ steps.docker_meta.outputs.labels }}            
+          labels: ${{ steps.docker_meta.outputs.labels }}
